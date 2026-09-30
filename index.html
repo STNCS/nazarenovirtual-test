@@ -38,10 +38,10 @@
 <section class="section admissions" id="admision"><div class="wrap admission-grid reveal"><div><div class="label">Da el siguiente paso</div><h2>Tu llamado también puede crecer aquí.</h2><p>Conoce el proceso de inscripción y encuentra la información necesaria para comenzar tu formación con el Seminario Nazareno Virtual.</p></div><a class="btn" href="mailto:contacto@nazarenovirtual.net?subject=Informaci%C3%B3n%20de%20inscripci%C3%B3n">Solicitar información&nbsp; →</a></div></section>
 <section class="section allies" id="alianza"><div class="wrap"><div class="reveal"><div class="label">Una misión compartida</div><h2>Miembros de la alianza</h2><p class="sub">Una comunidad de instituciones comprometidas con la formación teológica en América Latina.</p></div><div class="logo-grid reveal delay"><div class="logo-placeholder"><img src="img/aliados/aliado-1.png" alt="Seminario aliado 1"></div><div class="logo-placeholder"><img src="img/aliados/aliado-2.png" alt="Seminario aliado 2"></div><div class="logo-placeholder"><img src="img/aliados/aliado-3.png" alt="Seminario aliado 3"></div><div class="logo-placeholder"><img src="img/aliados/aliado-4.png" alt="Seminario aliado 4"></div><div class="logo-placeholder"><img src="img/aliados/aliado-5.png" alt="Seminario aliado 5"></div><div class="logo-placeholder"><img src="img/aliados/aliado-6.png" alt="Seminario aliado 6"></div><div class="logo-placeholder"><img src="img/aliados/aliado-7.png" alt="Seminario aliado 7"></div><div class="logo-placeholder"><img src="img/aliados/aliado-8.png" alt="Seminario aliado 8"></div></div></div></section>
 <section class="contact" id="contacto"><div class="wrap contact-grid"><div><div class="label">Estamos para ayudarte</div><h2>Hablemos de tu próximo paso.</h2><p>Escríbenos y con gusto te orientaremos.</p><a class="contact-mail" href="mailto:contacto@nazarenovirtual.net">contacto@nazarenovirtual.net</a></div>
-<form class="form" id="contact-form" action="https://formsubmit.co/stn.edicion1@gmail.com" method="POST">
+<form class="form" id="contact-form" action="https://formsubmit.co/contacto@seminarionazareno.online" method="POST">
 <label>Nombre<input required type="text" name="nombre" placeholder="Tu nombre" autocomplete="name"></label>
 <label>Correo electrónico<input required type="email" name="email" placeholder="tu@email.com" autocomplete="email"></label>
-<label>Denominación<input required type="denominacion" name="denominacion" placeholder="Por ejemplo: Iglesia del Nazareno" autocomplete="denominacion"></label>
+<label>Denominación<input type="text" name="denominacion" placeholder="Tu denominación o iglesia"></label>
 <label>País<select name="pais" required onchange="paisOtro(this)"><option value="">Selecciona tu país</option><option>Argentina</option><option>Bolivia</option><option>Brasil</option><option>Chile</option><option>Colombia</option><option>Costa Rica</option><option>Cuba</option><option>Ecuador</option><option>El Salvador</option><option>España</option><option>Estados Unidos</option><option>Guatemala</option><option>Honduras</option><option>México</option><option>Nicaragua</option><option>Panamá</option><option>Paraguay</option><option>Perú</option><option>Puerto Rico</option><option>República Dominicana</option><option>Uruguay</option><option>Venezuela</option><option value="Otro">Otro</option></select></label>
 <label id="campo-otro-pais" hidden>Especifica tu país<input type="text" name="otro_pais" placeholder="Escribe el nombre de tu país"></label>
 <label>Mensaje<textarea required name="mensaje" placeholder="¿En qué podemos ayudarte?"></textarea></label>
@@ -80,13 +80,17 @@ form.addEventListener('submit',async e=>{
   btn.disabled=true;status.className='form-status';status.textContent='Enviando…';
   try{
     const res=await fetch(form.action.replace('formsubmit.co/','formsubmit.co/ajax/'),{method:'POST',headers:{Accept:'application/json'},body:new FormData(form)});
-    const data=await res.json();
-    if(!res.ok||String(data.success)!=='true')throw new Error();
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok||String(data.success)!=='true'){console.warn('FormSubmit:',data);throw new Error(data.message||'error')}
     form.reset();paisOtro(form.elements.pais);
     status.classList.add('ok');status.textContent='¡Gracias! Recibimos tu mensaje y te responderemos pronto.';
+    btn.disabled=false;
   }catch(err){
-    status.classList.add('error');status.textContent='No pudimos enviar el mensaje. Inténtalo de nuevo o escríbenos a contacto@nazarenovirtual.net.';
-  }finally{btn.disabled=false}
+    /* Plan B: envío normal del formulario. FormSubmit muestra su propia página
+       (incluido el aviso de activación si el formulario aún no está activado). */
+    status.classList.add('error');status.textContent='Enviando por el método alternativo…';
+    form.submit();
+  }
 });
 </script>
 </body></html>
